@@ -20,6 +20,7 @@ try:
     from sqlalchemy import create_engine, Column, event
     from sqlalchemy import Integer, String, Boolean, DateTime, Enum, func
     from sqlalchemy import ForeignKey, Text, Index, Table
+    from sqlalchemy import text as sqlalchemy_text
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.exc import SQLAlchemyError, IntegrityError
     from sqlalchemy.orm import sessionmaker, relationship, joinedload, backref
@@ -612,13 +613,14 @@ class Database(object):
         row = None
         try:
             if machine != "":
+                # row = session.query(Task).filter_by(status=TASK_PENDING).filter_by(machine=machine).order_by(sqlalchemy_text("priority desc, added_on")).first()
                 row = session.query(Task).filter_by(status=TASK_PENDING).filter_by(machine=machine).order_by("priority desc, added_on").first()
             else:
+                # row = session.query(Task).filter_by(status=TASK_PENDING).order_by(sqlalchemy_text("priority desc, added_on")).first()
                 row = session.query(Task).filter_by(status=TASK_PENDING).order_by("priority desc, added_on").first()
 
             if not row:
                 return None
-
             if lock:
                 self.set_status(task_id=row.id, status=TASK_RUNNING)
                 session.refresh(row)
